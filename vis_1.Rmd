@@ -40,6 +40,7 @@ weather_df |>
   geom_point()
 ```
 
+Check why some rows are missing. 
 
 ```{r}
 ggp_weather = 
@@ -48,6 +49,59 @@ ggp_weather =
 
 ggp_weather + geom_point()
 
+```
+
+
+##Fancier scatterplots!
+
+```{r}
+weather_df |>
+ggplot(aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3, size = .8) + 
+  geom_smooth(se = FALSE)
+```
+
+Where you define aesthetics can matter
+
+```{r}
+weather_df |>
+ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name), alpha = .3, size = .8) + 
+  geom_smooth(se = FALSE)
+```
+
+Use faceting real quick
+
+```{r}
+weather_df |>
+ggplot(aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ name)
+```
+
+Let's make a somewhat more interesting scatterplot
+```{r}
+weather_df |>
+ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(aes(size = prcp), alpha = .3) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ name)
+```
+
+##Learning assessment plot
+
+Write a code chain that starts with weather_df; focuses only on Central Park, converts temperatures to Fahrenheit, makes a scatterplot of min vs. max temperature, and overlays a linear regression line (using options in geom_smooth())
+
+```{r}
+weather_df |>
+filter(name == "CentralPark_NY") |> 
+  mutate(
+    tmax_fahr = tmax * (9 / 5) + 32,
+    tmin_fahr = tmin * (9 / 5) + 32) |> 
+  ggplot(aes(x = tmin_fahr, y = tmax_fahr)) +
+  geom_point(alpha = .5) + 
+  geom_smooth(method = "lm", se = FALSE)
 ```
 
 
