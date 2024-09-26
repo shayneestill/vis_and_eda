@@ -1,115 +1,53 @@
 ---
-title: "Data import"
+title: "Vis 1"
 output: github_document
 ---
 
-```{r setup, echo = FALSE, message = FALSE}
+```{r setup, include = FALSE}
 library(tidyverse)
-library(readxl)
-library(haven)
+library(ggridges)
 ```
-
-This document will show how to import data. 
-
-## Import the FAS Litters CSV
 
 ```{r}
-litters_df = read_csv("data/FAS_litters.csv")
-
-litters_df = janitor::clean_names(litters_df)
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2022-12-31") |>
+  mutate(
+    name = case_match(
+      id, 
+      "USW00094728" ~ "CentralPark_NY", 
+      "USW00022534" ~ "Molokai_HI",
+      "USS0023B17S" ~ "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) |>
+  select(name, id, everything())
 ```
 
-#Look at the dataset
+Making our first plot :) 
 
 ```{r}
-litters_df
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+   geom_point()
 
-head(litters_df)
-tail(litters_df, 10)
 ```
-
-```{r eval = FALSE}
-view(litters_df)
-```
-
-
-Use relative paths. 
 
 ```{r}
-pups_df = 
-    read_csv("data/FAS_pups.csv")
-
-pups_df = janitor::clean_names(pups_df)
-          
-pups_df
+weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
 ```
 
-Use absolute paths.
 
 ```{r}
+ggp_weather = 
+  weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) 
+
+ggp_weather + geom_point()
 
 ```
 
-## Look at read_csv options
-
-col_names and skipping rows
-
-```{r}
-litters_df = 
-  read_csv(
-    file = "data/FAS_litters.csv",
-    col_names = FALSE,
-    skip = 1
-  )
-```
-
-What about missing data
-```{r}
-litters_df = 
-  read_csv(
-    file = "data/FAS_litters.csv",
-    na = c("NA", "", ".")
-  )
-
-litters_df = janitor::clean_names(litters_df)
-
-pull(litters_df, gd0_weight)
-```
-
-What if we code 'group' as a factor variable?
-
-```{r}
-litters_df = 
-  read_csv(
-    file = "data/FAS_litters.csv",
-    na = c("NA", "", "."),
-    col_types = cols(
-      Group = col_factor()
-    )
-  )
-```
-
-##Import excel file
-
-Import MLB 2011 summary data.
-
-```{r}
-mlb_df = read_excel("data/mlb11.xlsx", sheet = "mlb11", range = )
-
-```
-
-##Import SAS data
-
-```{r}
-pulse_df = read_sas("data/public_pulse_data.sas7bdat")
-```
-
-
-##Never use read.csv()
-
-```{r}
-litters_df = read.csv("data/FAS_ltiters.csv")
-
-
-```
 
